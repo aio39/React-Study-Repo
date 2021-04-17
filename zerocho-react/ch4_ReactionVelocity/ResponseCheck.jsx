@@ -1,70 +1,63 @@
-import React, { Component } from 'react';
-import { render } from 'react-dom';
+import React, { useState, memo, useRef, useCallback } from 'react';
 
-class ResponseCheck extends Component {
-  state = {
-    state: 'waiting',
-    message: '클릭해서 시작하세요.',
-    result: [],
-  };
-  timeout;
-  startTime;
-  endTime;
+const ResponseCheck = () => {
+  const [state, setState] = useState('waiting');
+  const [message, setMessage] = useState('클릭해서 시작하세요.');
+  const [result, setResult] = useState([]);
 
-  onClickScreen = () => {
-    const { state, message, result } = this.state;
+  const timeOut = useRef(null);
+  const startTime = useRef(0);
+  const endTime = useRef(0);
+
+  const onClickScreen = () => {
     if (state === 'waiting') {
-      this.setState({ state: 'ready', message: '초록색이 되면 클릭하세요' });
-      this.timeout = setTimeout(() => {
-        this.setState({ state: 'now', message: '지금 클릭' });
+      setState('ready');
+      setMessage('초록색이 되면 클릭하세요 .');
+      timeOut.current = setTimeout(() => {
+        setState('now');
+        setMessage('지금 클릭하세요..');
       }, Math.floor(Math.random() * 1000) + 2000);
 
-      this.startTime = new Date();
+      startTime.current = new Date();
     } else if (state === 'ready') {
-      clearTimeout(this.timeout);
-      this.setState({ state: 'waiting', message: '초록색이 되면 눌러주세요.' });
+      clearTimeout(timeOut.current);
+      setState('waiting');
+      setMessage('초록색이 되면 눌러주세요.');
     } else if (state === 'now') {
-      this.endTime = new Date();
-      this.setState((prevState) => {
-        return {
-          state: 'waiting',
-          message: '클릭해서 시작하세요',
-          result: [...prevState.result, this.endTime - this.startTime],
-        };
-      });
+      endTime.current = new Date();
+      setState('waiting');
+      setMessage('클릭해서 시작하세요.');
+      setResult((prevState) => [
+        ...prevState,
+        endTime.current - startTime.current,
+      ]);
     }
   };
 
-  onReset = () => {
-    this.setState({
-      result: [],
-    });
+  const onReset = () => {
+    setResult([]);
   };
 
-  renderAverage = () => {
-    const { result } = this.state;
+  const renderAverage = () => {
     return result.length === 0 ? null : (
       <>
         <div>
           평균시간: {Math.floor(result.reduce((a, c) => a + c) / result.length)}
           ms
         </div>
-        <button onClick={this.onReset}> Reset</button>
+        <button onClick={onReset}> Reset</button>
       </>
     );
   };
 
-  render() {
-    const { state, message } = this.state;
-    return (
-      <>
-        <div id="screen" className={state} onClick={this.onClickScreen}>
-          {message}
-        </div>
-        {this.renderAverage()}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <div id="screen" className={state} onClick={onClickScreen}>
+        {message}
+      </div>
+      {renderAverage()}
+    </>
+  );
+};
 
 export default ResponseCheck;
