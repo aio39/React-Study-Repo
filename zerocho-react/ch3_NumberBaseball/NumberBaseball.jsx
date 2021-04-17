@@ -23,8 +23,12 @@ const NumberBaseball = () => {
     if (value === answer.join('')) {
       setResults('홈런');
       setTries((prevTries) => {
-        return [...prevTries, { try: value, result: '홈런!' }];
+        return [...prevTries, { try: value, results: '홈런!' }];
       });
+      alert('게임을 다시 시작합니다.');
+      setValue('');
+      setAnswer(getNumbers());
+      setTries([]);
     } else {
       const answerArray = value.split('').map((v) => parseInt(v));
       let strike = 0;
@@ -44,18 +48,16 @@ const NumberBaseball = () => {
           }
           setTries((prevTries) => {
             [
-              ...tries,
+              ...prevTries,
               {
                 try: value,
-                result: `${strike} 스트라이크, ${ball} 볼 입니다.`,
+                results: `${strike} 스트라이크, ${ball} 볼 입니다.`,
               },
             ];
           });
         }
       }
     }
-    console.log(value);
-    console.log(answer);
   };
 
   const onChangeInput = (e) => {
@@ -66,7 +68,12 @@ const NumberBaseball = () => {
     <>
       <h1>{results}</h1>
       <form onSubmit={onSubmitForm}>
-        <input maxLength={4} value={value} onChange={onChangeInput} />
+        <input
+          ref={onInput}
+          maxLength={4}
+          value={value}
+          onChange={onChangeInput}
+        />
       </form>
       <div>시도:{tries.length}</div>
       <ul>

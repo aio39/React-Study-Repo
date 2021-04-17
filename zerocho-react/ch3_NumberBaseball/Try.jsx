@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-const Try = (props) => {
+const Try = memo((props) => {
   const { tryInfo } = props;
   return (
     <li>
@@ -8,6 +8,6 @@ const Try = (props) => {
       <div>{tryInfo.result}</div>
     </li>
   );
-};
+});
 
 export default Try;
