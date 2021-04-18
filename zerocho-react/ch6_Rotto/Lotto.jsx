@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import Ball from './Ball';
 
 function getWinNumbers() {
+  console.log('getWinNumbers');
   const candidate = Array(45)
     .fill()
     .map((v, i) => i + 1);
@@ -15,7 +16,8 @@ function getWinNumbers() {
 }
 
 const Lotto = () => {
-  const [winNumber, setWinNumber] = useState(getWinNumbers());
+  const lottoNumber = useMemo(() => getWinNumbers(), []);
+  const [winNumber, setWinNumber] = useState(lottoNumber);
   const [winBalls, setWinBalls] = useState([]);
   const [bonus, setBonus] = useState(null);
   const [redo, setRedo] = useState(false);
@@ -23,11 +25,9 @@ const Lotto = () => {
   const timeouts = useRef([]);
 
   useEffect(() => {
-    console.log(winBalls);
     for (let i = 0; i < winNumber.length - 1; i++) {
       timeouts.current[i] = setTimeout(() => {
         setWinBalls(prevState => [...prevState, winNumber[i]]);
-        console.log(winBalls);
       }, (i + 1) * 1000);
     }
 
@@ -43,13 +43,13 @@ const Lotto = () => {
     };
   }, [timeouts.current]); // 비니 배열이면 componentDid Mount와 동일함.
 
-  const onClickRedo = () => {
+  const onClickRedo = useCallback(() => {
     setWinNumber(getWinNumbers());
     setWinBalls([]);
     setBonus(null);
     setRedo(false);
     timeouts.current = [];
-  };
+  }, [winNumber]);
 
   return (
     <>
