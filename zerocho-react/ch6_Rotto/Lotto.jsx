@@ -8,9 +8,7 @@ function getWinNumbers() {
     .map((v, i) => i + 1);
   const shuffle = [];
   while (candidate.length > 0) {
-    shuffle.push(
-      candidate.splice(Math.floor(Math.random() * candidate.length), 1)[0]
-    );
+    shuffle.push(candidate.splice(Math.floor(Math.random() * candidate.length), 1)[0]);
   }
   const bonusNumber = shuffle[shuffle.length - 1];
   const winNumber = shuffle.slice(0, 6).sort((p, c) => p - c);
@@ -27,11 +25,11 @@ export default class Lotto extends Component {
 
   timeouts = [];
 
-  componentDidMount() {
+  runTimeouts = () => {
     const { winNumber } = this.state;
     for (let i = 0; i < winNumber.length - 1; i++) {
       this.timeouts[i] = setTimeout(() => {
-        this.setState((prevState) => {
+        this.setState(prevState => {
           return {
             winBalls: [...prevState.winBalls, winNumber[i]],
           };
@@ -44,13 +42,33 @@ export default class Lotto extends Component {
         redo: true,
       });
     }, 7000);
+  };
+
+  componentDidMount() {
+    this.runTimeouts();
   }
 
   componentWillUnmount() {
-    this.timeouts.forEach((t) => {
+    this.timeouts.forEach(t => {
       clearTimeout(t);
     });
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.winBalls.length === 0) {
+      this.runTimeouts();
+    }
+  }
+
+  onClickRedo = () => {
+    this.setState({
+      winNumber: getWinNumbers(),
+      winBalls: [],
+      bonus: null,
+      redo: false,
+    });
+    this.timeouts = [];
+  };
 
   render() {
     const { winBalls, bonus, redo } = this.state;
@@ -59,7 +77,7 @@ export default class Lotto extends Component {
       <>
         <div>당첨숫자</div>
         <div id=" 결과창">
-          {winBalls.map((v) => (
+          {winBalls.map(v => (
             <Ball key={v} number={v} />
           ))}
         </div>
