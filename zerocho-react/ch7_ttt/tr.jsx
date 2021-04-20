@@ -7,13 +7,7 @@ const Tr = ({ rowData, rowIndex, dispatch }) => {
       {Array(rowData.length)
         .fill()
         .map((td, i) => (
-          <Td
-            cellData={rowData[i]}
-            dispatch={dispatch}
-            rowIndex={rowIndex}
-            cellIndex={i}
-            tdDate={rowData[i]}
-          />
+          <Td cellData={rowData[i]} dispatch={dispatch} rowIndex={rowIndex} cellIndex={i} />
         ))}
     </tr>
   );
