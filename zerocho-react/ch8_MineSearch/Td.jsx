@@ -1,4 +1,5 @@
-import React, { useCallback, useContext } from 'react';
+/* eslint-disable react/display-name */
+import React, { memo, useCallback, useContext, useMemo } from 'react';
 import {
   CLICKED_MINE,
   CODE,
@@ -52,7 +53,7 @@ const getTdText = code => {
   }
 };
 
-const Td = ({ rowIndex, cellIndex }) => {
+const Td = memo(({ rowIndex, cellIndex }) => {
   const { tableData, dispatch, halted } = useContext(TableContext);
   const onClickTd = useCallback(() => {
     if (halted) return;
@@ -96,14 +97,20 @@ const Td = ({ rowIndex, cellIndex }) => {
   );
 
   return (
-    <td
-      onClick={onClickTd}
-      onContextMenu={onRightClickTd}
-      style={getTdStyle(tableData[rowIndex][cellIndex])}
-    >
-      {getTdText(tableData[rowIndex][cellIndex])}
+    <RealTd
+      onClickTd={onClickTd}
+      onRightClickTd={onRightClickTd}
+      data={tableData[rowIndex][cellIndex]}
+    />
+  );
+});
+
+const RealTd = memo(({ onClickTd, onRightClickTd, data }) => {
+  return (
+    <td onClick={onClickTd} onContextMenu={onRightClickTd} style={getTdStyle(data)}>
+      {getTdText(data)}
     </td>
   );
-};
+});
 
 export default Td;

@@ -1,4 +1,5 @@
-import React, { useReducer, createContext, useMemo, useEffect } from 'react';
+/* eslint-disable react/display-name */
+import React, { useReducer, createContext, useMemo, useEffect, memo } from 'react';
 import Form from './Form';
 import Table from './Table';
 
@@ -196,7 +197,7 @@ const reducer = (state, action) => {
   }
 };
 
-const MineSearch = () => {
+const MineSearch = memo(() => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { tableData, halted, timer, result } = state;
   const value = useMemo(
@@ -231,6 +232,6 @@ const MineSearch = () => {
       </TableContext.Provider>
     </>
   );
-};
+});
 
 export default MineSearch;
