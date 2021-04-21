@@ -1,4 +1,4 @@
-import React, { useReducer, createContext, useMemo } from 'react';
+import React, { useReducer, createContext, useMemo, useEffect } from 'react';
 import Form from './Form';
 import Table from './Table';
 
@@ -25,10 +25,16 @@ export const NORMALIZE_CELL = 'NORMALIZE_CELL';
 export const OPEN_CELL = 'OPEN_CELL';
 export const QUESTION_CELL = 'QUESTION_CELL';
 export const START_GAME = 'START_GAME';
+export const INCREMENT_TIMER = 'INCREMENT_TIMER';
 
 const initialState = {
   tableData: [],
   timer: 0,
+  data: {
+    row: 0,
+    cell: 0,
+    mine: 0,
+  },
   halted: true,
 };
 
@@ -68,8 +74,15 @@ const reducer = (state, action) => {
     case START_GAME:
       return {
         ...state,
+        data: {
+          row: action.row,
+          cell: action.cell,
+          mine: action.mine,
+        },
+        openedCount: 0,
         tableData: plantMine(action.row, action.cell, action.mine),
         halted: false,
+        timer: 0,
       };
     case OPEN_CELL: {
       const tableData = [...state.tableData];
@@ -144,8 +157,15 @@ const reducer = (state, action) => {
         tableData[row][cell] = count;
       };
       checkAround(action.row, action.cell);
-      const halted = false;
-      const result = '';
+
+      let halted = false;
+      let result = '';
+      console.log(state.data.row * state.data.cell - state.data.mine);
+      console.log(state.openedCount + openedCount);
+      if (state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount) {
+        halted = true;
+        result = `${state.timer}초 만에 승리하셨습니다. `;
+      }
 
       return {
         ...state,
@@ -165,6 +185,12 @@ const reducer = (state, action) => {
         halted: true,
       };
     }
+    case INCREMENT_TIMER: {
+      return {
+        ...state,
+        timer: state.timer + 1,
+      };
+    }
     default:
       return state;
   }
@@ -181,6 +207,19 @@ const MineSearch = () => {
     }),
     [tableData, halted],
   );
+
+  useEffect(() => {
+    let timer;
+    if (halted === false) {
+      timer = setInterval(() => {
+        dispatch({ type: INCREMENT_TIMER });
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [halted]);
 
   return (
     <>
